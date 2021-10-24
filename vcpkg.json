@@ -1,0 +1,13 @@
+{
+  "name": "oxygen-meter",
+  "version-string": "1.0.0",
+  "description": "Oxygen Meter",
+  "homepage": "",
+  "license": "MIT",
+  "dependencies": [
+    "boost-stl-interfaces",
+    "simpleini",
+    "spdlog",
+    "xbyak"
+  ]
+}
