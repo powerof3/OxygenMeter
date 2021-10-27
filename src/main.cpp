@@ -4,8 +4,69 @@ namespace OxygenMeter
 {
 	struct Update
 	{
+		static void thunk(RE::HUDChargeMeter* a_this)
+		{
+			auto fillPct = detail::get_player_breath_pct();
+			if (fillPct) {
+				if (!holding_breath) {
+					holding_breath = true;
+
+					alphaValue = detail::set_meter_alpha(useLeftMeter, 100.0);
+					if (alphaValue == 100.0) {
+						a_this->root.Invoke("FadeOutChargeMeters");
+					}
+				}
+
+				if (drowning && fadeWhenDrowning) {
+					a_this->root.Invoke("FadeOutChargeMeters");
+					return;
+				}
+
+				std::array<RE::GFxValue, 4> array{ *fillPct, true, useLeftMeter, true };
+				a_this->root.Invoke("SetChargeMeterPercent", nullptr, array);
+
+				if (*fillPct == 0.0) {
+					drowning = true;
+				}
+			} else {
+				if (holding_breath || drowning) {
+					holding_breath = false;
+					drowning = false;
+
+					if (alphaValue == 0.0) {
+						detail::set_meter_alpha(useLeftMeter, alphaValue);
+					} else {
+						a_this->root.Invoke("FadeOutChargeMeters");
+					}
+				}
+
+				func(a_this);
+			}
+		}
+		static inline REL::Relocation<decltype(thunk)> func;
+
+		static inline constexpr std::size_t size = 0x1;
+
+	private:
 		struct detail
 		{
+			static double set_meter_alpha(bool a_useLeftMeter, double a_value)
+			{
+				if (auto movie = RE::UI::GetSingleton()->GetMovieView(RE::HUDMenu::MENU_NAME); movie) {
+					auto path = a_useLeftMeter ?
+                                    left_path :
+                                    right_path;
+
+					auto value = movie->GetVariableDouble(path);
+					if (value != a_value) {
+						movie->SetVariableDouble(path, a_value);
+						return value;
+					}
+				}
+
+				return 100.0f;
+			}
+
 			static float get_total_breath_time()
 			{
 				const auto gamesetting = RE::GameSettingCollection::GetSingleton();
@@ -30,46 +91,19 @@ namespace OxygenMeter
 
 				return (remainingBreath / totalBreathTime) * 100.0;
 			}
+
+		private:
+			static inline const char* left_path{ "_root.HUDMovieBaseInstance.BottomLeftLockInstance._alpha" };
+			static inline const char* right_path{ "_root.HUDMovieBaseInstance.BottomRightLockInstance._alpha" };
 		};
 
-		static void thunk(RE::HUDChargeMeter* a_this)
-		{
-			static bool holding_breath = false;
-			static bool drowning = false;
+		static inline bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
+		static inline bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
 
-			auto fillPct = detail::get_player_breath_pct();
-			if (fillPct) {
-				static bool fadeWhenDrowning = Settings::GetSingleton()->fadeWhenDrowning;
-				if (drowning && fadeWhenDrowning) {
-					a_this->root.Invoke("FadeOutChargeMeters");
-					return;
-				}
-				
-				if (!holding_breath) {
-					a_this->root.Invoke("FadeOutChargeMeters");
-					holding_breath = true;
-				}
+		static inline bool holding_breath{ false };
+		static inline bool drowning{ false };
 
-				static bool useLeftMeter = static_cast<bool>(Settings::GetSingleton()->useLeftMeter);
-				std::array<RE::GFxValue, 4> array{ *fillPct, true, useLeftMeter, true };
-				a_this->root.Invoke("SetChargeMeterPercent", nullptr, array);
-
-				if (*fillPct == 0.0) {
-					drowning = true;
-				}
-			} else {
-				if (holding_breath || drowning) {
-					a_this->root.Invoke("FadeOutChargeMeters");
-					holding_breath = false;
-					drowning = false;
-				}
-
-				func(a_this);
-			}
-		}
-		static inline REL::Relocation<decltype(thunk)> func;
-
-		static inline constexpr std::size_t size = 0x1;
+		static inline double alphaValue{ 100.0 };
 	};
 
 	inline void Install()
