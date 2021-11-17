@@ -6,6 +6,9 @@ namespace OxygenMeter
 	{
 		static void thunk(RE::HUDChargeMeter* a_this)
 		{
+			static bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
+			static bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
+			
 			auto fillPct = detail::get_player_breath_pct();
 			if (fillPct) {
 				if (!holding_breath) {
@@ -96,9 +99,6 @@ namespace OxygenMeter
 			static inline const char* left_path{ "_root.HUDMovieBaseInstance.BottomLeftLockInstance._alpha" };
 			static inline const char* right_path{ "_root.HUDMovieBaseInstance.BottomRightLockInstance._alpha" };
 		};
-
-		static inline bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
-		static inline bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
 
 		static inline bool holding_breath{ false };
 		static inline bool drowning{ false };
