@@ -85,7 +85,7 @@ namespace OxygenMeter
 			static std::optional<double> get_player_breath_pct()
 			{
 				auto player = RE::PlayerCharacter::GetSingleton();
-				if (player->GetSubmergedWaterLevel(player->GetPositionZ(), player->GetParentCell()) < 0.875f || player->IsInvulnerable() || player->GetActorValue(RE::ActorValue::kWaterBreathing) > 0.0001f) {
+				if (player->IsPointDeepUnderWater(player->GetPositionZ(), player->GetParentCell()) < 0.875f || player->IsInvulnerable() || player->GetActorValue(RE::ActorValue::kWaterBreathing) > 0.0001f) {
 					return std::nullopt;
 				}
 

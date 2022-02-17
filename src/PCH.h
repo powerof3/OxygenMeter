@@ -7,6 +7,7 @@
 #include "SKSE/SKSE.h"
 
 #include <SimpleIni.h>
+#include <fmt/format.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 
