@@ -1,4 +1,10 @@
 #include "Settings.h"
+#include "SKSE/API.h"
+#include "oxyMeter.h"
+
+const SKSE::MessagingInterface* g_messaging = nullptr;
+const SKSE::LoadInterface* g_LoadInterface = nullptr;
+const SKSE::QueryInterface* g_QueryInterface = nullptr;
 
 namespace OxygenMeter
 {
@@ -6,11 +12,23 @@ namespace OxygenMeter
 	{
 		static void thunk(RE::HUDChargeMeter* a_this)
 		{
+			RE::GPtr<RE::IMenu> oxyRoot = RE::UI::GetSingleton()->GetMenu("oxygenMeter");
+			RE::GFxValue rootElement;
+			oxyRoot->uiMovie->GetVariable(&rootElement, "oxygen");
+
+			RE::GFxValue oxygen_mc = GetGFxMember(rootElement, "oxygen");
+			RE::GFxValue oxygen_mc = GetGFxMember(rootElement, "oxygen");
+
 			static bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
 			static bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
 			
 			auto fillPct = detail::get_player_breath_pct();
 			if (fillPct) {
+				oxygenMenu::Show();
+
+				std::array<RE::GFxValue, 2> testArray{ 50, true };
+				a_this->root.Invoke("SetHealthMeterPercent", nullptr, testArray);
+
 				if (!holding_breath) {
 					holding_breath = true;
 
@@ -32,6 +50,7 @@ namespace OxygenMeter
 					drowning = true;
 				}
 			} else {
+				oxygenMenu::Hide();
 				if (holding_breath || drowning) {
 					holding_breath = false;
 					drowning = false;
@@ -112,6 +131,23 @@ namespace OxygenMeter
 	}
 }
 
+static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
+{
+	switch (message->type) {
+	case SKSE::MessagingInterface::kDataLoaded:
+		oxygenMenu::Register();
+		break;
+
+	case SKSE::MessagingInterface::kNewGame:
+		//oxygenMenu::Show();
+		break;
+
+	case SKSE::MessagingInterface::kPostLoadGame:
+		//oxygenMenu::Show();
+		break;
+	}
+}
+
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	auto path = logger::log_directory();
@@ -152,6 +188,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
+	//while (!IsDebuggerPresent()) {};
 	logger::info("loaded plugin");
 
 	SKSE::Init(a_skse);
@@ -159,6 +196,20 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	Settings::GetSingleton()->Load();
 
 	OxygenMeter::Install();
+
+	g_messaging = reinterpret_cast<SKSE::MessagingInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kMessaging));
+	if (!g_messaging) {
+		logger::critical("Failed to load messaging interface! This error is fatal, plugin will not load.");
+		return false;
+	}
+
+	auto papyrus = reinterpret_cast<SKSE::PapyrusInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kPapyrus));
+	if (!papyrus) {
+		logger::critical("Failed to load scripting interface! This error is fatal, plugin will not load.");
+		return false;
+	}
+
+	g_messaging->RegisterListener("SKSE", SKSEMessageHandler);
 
 	return true;
 }
