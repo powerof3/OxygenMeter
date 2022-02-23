@@ -1,4 +1,6 @@
 #include "PCH.h"
+#include "RE/G/GFxValue.h"
+#include "RE/G/GPtr.h"
 
 class oxygenMenu : RE::IMenu
 {

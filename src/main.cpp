@@ -12,22 +12,16 @@ namespace OxygenMeter
 	{
 		static void thunk(RE::HUDChargeMeter* a_this)
 		{
+			oxygenMenu::Hide();
 			RE::GPtr<RE::IMenu> oxyRoot = RE::UI::GetSingleton()->GetMenu("oxygenMeter");
-			RE::GFxValue rootElement;
-			oxyRoot->uiMovie->GetVariable(&rootElement, "oxygen");
-
-			RE::GFxValue oxygen_mc = GetGFxMember(rootElement, "oxygen");
-			RE::GFxValue oxygen_mc = GetGFxMember(rootElement, "oxygen");
 
 			static bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
 			static bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
 			
 			auto fillPct = detail::get_player_breath_pct();
-			if (fillPct) {
-				oxygenMenu::Show();
-
-				std::array<RE::GFxValue, 2> testArray{ 50, true };
-				a_this->root.Invoke("SetHealthMeterPercent", nullptr, testArray);
+			if (fillPct && oxyRoot) {
+				oxygenMenu::Hide();
+				const RE::GFxValue testAmount = *fillPct;
 
 				if (!holding_breath) {
 					holding_breath = true;
@@ -40,17 +34,24 @@ namespace OxygenMeter
 
 				if (drowning && fadeWhenDrowning) {
 					a_this->root.Invoke("FadeOutChargeMeters");
+					oxyRoot->uiMovie->Invoke("oxygen.doFadeOut", nullptr, &testAmount, 1);
 					return;
 				}
 
 				std::array<RE::GFxValue, 4> array{ *fillPct, true, useLeftMeter, true };
 				a_this->root.Invoke("SetChargeMeterPercent", nullptr, array);
+				oxyRoot->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &testAmount, 1);
+
 
 				if (*fillPct == 0.0) {
 					drowning = true;
 				}
 			} else {
-				oxygenMenu::Hide();
+				if (oxyRoot) {
+					const RE::GFxValue testAmount = 100;
+					oxyRoot->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &testAmount, 1);
+					oxyRoot->uiMovie->Invoke("oxygen.doFadeOut", nullptr, &testAmount, 1);
+				}
 				if (holding_breath || drowning) {
 					holding_breath = false;
 					drowning = false;
@@ -139,11 +140,11 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 		break;
 
 	case SKSE::MessagingInterface::kNewGame:
-		//oxygenMenu::Show();
+		oxygenMenu::Hide();
 		break;
 
 	case SKSE::MessagingInterface::kPostLoadGame:
-		//oxygenMenu::Show();
+		oxygenMenu::Hide();
 		break;
 	}
 }

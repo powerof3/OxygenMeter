@@ -15,6 +15,12 @@ class oxygenMenu1 extends MovieClip
 	function oxygenMenu1()
 	{
 		super();
+		setAmountText(100);
+	}
+	
+	function setAmountText(aNumber: Number): Void
+	{
+		amountText.text = aNumber.toString();
 	}
 		
 }
