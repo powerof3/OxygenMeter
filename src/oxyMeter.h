@@ -20,6 +20,11 @@ public:
 	void AdvanceMovie(float a_interval, std::uint32_t a_currentTime) override;
 
 private:
+	static inline bool holding_breath{ false };
+	static inline bool drowning{ false };
+	static inline double alphaValue{ 100.0 };
+
+private:
 	class Logger : public RE::GFxLog
 	{
 	public:
