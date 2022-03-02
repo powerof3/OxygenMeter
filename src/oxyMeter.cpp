@@ -43,3 +43,20 @@ void oxygenMenu::Hide()
 		msgQ->AddMessage(oxygenMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
 	}
 }
+
+void oxygenMenu::Update()
+{
+	RE::DebugNotification("1");
+	RE::GPtr<RE::IMenu> oxygenMenu = RE::UI::GetSingleton()->GetMenu(oxygenMenu::MENU_NAME);
+	if (!oxygenMenu || !oxygenMenu->uiMovie)
+		return;
+
+}
+
+void oxygenMenu::AdvanceMovie(float a_interval, std::uint32_t a_currentTime)
+{
+	RE::DebugNotification("AdvanceMovie");
+	oxygenMenu::Update();
+
+	RE::IMenu::AdvanceMovie(a_interval, a_currentTime);
+}

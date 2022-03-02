@@ -13,8 +13,11 @@ public:
     static void Register();
 	static void Show();
 	static void Hide();
+	static void Update();
 
     static RE::stl::owner<RE::IMenu*> Creator() { return new oxygenMenu(); }
+
+	void AdvanceMovie(float a_interval, std::uint32_t a_currentTime) override;
 
 private:
 	class Logger : public RE::GFxLog

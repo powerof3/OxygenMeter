@@ -35,7 +35,8 @@ class OxygenMeter extends MovieClip
 	
 	function onLoad(): Void
 	{
-		//doFadeOut();
+		doFadeOut();
+		//doShow();
 	}
 	
 	public function doFadeOut(): Void
@@ -57,7 +58,6 @@ class OxygenMeter extends MovieClip
 	
 	public function setMeterPercent(CurrentPercent:Number):Void
 	{
-		this.gotoAndStop("show");
 		MeterTimeline.clear();
 		CurrentPercent = doValueClamp(CurrentPercent);
 		MeterContainer.Mask._x = minWidth + (Percent * CurrentPercent);
@@ -70,7 +70,6 @@ class OxygenMeter extends MovieClip
 
 	public function updateMeterPercent(CurrentPercent:Number):Void
 	{
-		this.gotoAndStop("show");
 		CurrentPercent = doValueClamp(CurrentPercent);
 
 		if (!MeterTimeline.isActive())

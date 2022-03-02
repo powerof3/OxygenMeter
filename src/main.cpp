@@ -12,7 +12,6 @@ namespace OxygenMeter
 	{
 		static void thunk(RE::HUDChargeMeter* a_this)
 		{
-			oxygenMenu::Hide();
 			RE::GPtr<RE::IMenu> oxyRoot = RE::UI::GetSingleton()->GetMenu("oxygenMeter");
 
 			static bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
@@ -20,47 +19,33 @@ namespace OxygenMeter
 			
 			auto fillPct = detail::get_player_breath_pct();
 			if (fillPct && oxyRoot) {
-				oxygenMenu::Hide();
 				const RE::GFxValue testAmount = *fillPct;
 
 				if (!holding_breath) {
 					holding_breath = true;
-
-					alphaValue = detail::set_meter_alpha(useLeftMeter, 100.0);
-					if (alphaValue == 100.0) {
-						a_this->root.Invoke("FadeOutChargeMeters");
-					}
 				}
 
 				if (drowning && fadeWhenDrowning) {
-					a_this->root.Invoke("FadeOutChargeMeters");
 					oxyRoot->uiMovie->Invoke("oxygen.doFadeOut", nullptr, &testAmount, 1);
 					return;
 				}
 
-				std::array<RE::GFxValue, 4> array{ *fillPct, true, useLeftMeter, true };
-				a_this->root.Invoke("SetChargeMeterPercent", nullptr, array);
+				oxyRoot->uiMovie->Invoke("oxygen.doShow", nullptr, nullptr, 0);
 				oxyRoot->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &testAmount, 1);
-
 
 				if (*fillPct == 0.0) {
 					drowning = true;
 				}
-			} else {
-				if (oxyRoot) {
-					const RE::GFxValue testAmount = 100;
-					oxyRoot->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &testAmount, 1);
-					oxyRoot->uiMovie->Invoke("oxygen.doFadeOut", nullptr, &testAmount, 1);
-				}
+
+			} else if (oxyRoot){
+	
+
 				if (holding_breath || drowning) {
 					holding_breath = false;
 					drowning = false;
-
-					if (alphaValue == 0.0) {
-						detail::set_meter_alpha(useLeftMeter, alphaValue);
-					} else {
-						a_this->root.Invoke("FadeOutChargeMeters");
-					}
+					const RE::GFxValue refill = 100;
+					oxyRoot->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &refill, 1);
+					oxyRoot->uiMovie->Invoke("oxygen.doFadeOut", nullptr, nullptr, 0);
 				}
 
 				func(a_this);
@@ -73,23 +58,6 @@ namespace OxygenMeter
 	private:
 		struct detail
 		{
-			static double set_meter_alpha(bool a_useLeftMeter, double a_value)
-			{
-				if (auto movie = RE::UI::GetSingleton()->GetMovieView(RE::HUDMenu::MENU_NAME); movie) {
-					auto path = a_useLeftMeter ?
-                                    left_path :
-                                    right_path;
-
-					auto value = movie->GetVariableDouble(path);
-					if (value != a_value) {
-						movie->SetVariableDouble(path, a_value);
-						return value;
-					}
-				}
-
-				return 100.0f;
-			}
-
 			static float get_total_breath_time()
 			{
 				const auto gamesetting = RE::GameSettingCollection::GetSingleton();
@@ -114,10 +82,6 @@ namespace OxygenMeter
 
 				return (remainingBreath / totalBreathTime) * 100.0;
 			}
-
-		private:
-			static inline const char* left_path{ "_root.HUDMovieBaseInstance.BottomLeftLockInstance._alpha" };
-			static inline const char* right_path{ "_root.HUDMovieBaseInstance.BottomRightLockInstance._alpha" };
 		};
 
 		static inline bool holding_breath{ false };
@@ -140,11 +104,11 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 		break;
 
 	case SKSE::MessagingInterface::kNewGame:
-		oxygenMenu::Hide();
+		oxygenMenu::Show();
 		break;
 
 	case SKSE::MessagingInterface::kPostLoadGame:
-		oxygenMenu::Hide();
+		oxygenMenu::Show();
 		break;
 	}
 }
