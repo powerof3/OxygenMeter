@@ -7,11 +7,15 @@ oxygenMenu::oxygenMenu()
 	auto scaleformManager = RE::BSScaleformManager::GetSingleton();
 
 	inputContext = Context::kNone;
-	depthPriority = 10;
+	depthPriority = 1;
 
 	menuFlags.set(RE::UI_MENU_FLAGS::kRequiresUpdate);
 	menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving);
 	menuFlags.set(RE::UI_MENU_FLAGS::kCustomRendering);
+
+	if (uiMovie) {
+		uiMovie->SetMouseCursorCount(0);  // disable input
+	}
 
 	scaleformManager->LoadMovieEx(this, MENU_PATH, [](RE::GFxMovieDef* a_def) -> void {
 		a_def->SetState(RE::GFxState::StateType::kLog,

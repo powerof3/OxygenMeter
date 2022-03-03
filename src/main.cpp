@@ -11,7 +11,7 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
 	switch (message->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
-		//MenuOpenCloseEventHandler::Register();
+		MenuOpenCloseEventHandler::Register();
 		oxygenMenu::Register();
 		break;
 
