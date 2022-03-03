@@ -1,6 +1,7 @@
 #include "Settings.h"
 #include "SKSE/API.h"
 #include "oxyMeter.h"
+#include "Events.h"
 
 const SKSE::MessagingInterface* g_messaging = nullptr;
 const SKSE::LoadInterface* g_LoadInterface = nullptr;
@@ -10,6 +11,7 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
 	switch (message->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
+		//MenuOpenCloseEventHandler::Register();
 		oxygenMenu::Register();
 		break;
 

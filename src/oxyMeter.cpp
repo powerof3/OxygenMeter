@@ -101,7 +101,7 @@ void oxygenMenu::Update()
 		}
 
 		oxygenMenu->uiMovie->Invoke("oxygen.doShow", nullptr, nullptr, 0);
-		oxygenMenu->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &testAmount, 1);
+		oxygenMenu->uiMovie->Invoke("oxygen.setMeterPercent", nullptr, &testAmount, 1);
 
 		if (*fillPct == 0.0) {
 			drowning = true;
@@ -124,6 +124,3 @@ void oxygenMenu::AdvanceMovie(float a_interval, std::uint32_t a_currentTime)
 	oxygenMenu::Update();
 	RE::IMenu::AdvanceMovie(a_interval, a_currentTime);
 }
-
-
-
