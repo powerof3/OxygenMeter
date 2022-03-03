@@ -2,8 +2,6 @@
 #include "oxyMeter.h"
 #include "Settings.h"
 
-bool oxygenMenu::settingsApplied;
-
 oxygenMenu::oxygenMenu()
 {
 	auto scaleformManager = RE::BSScaleformManager::GetSingleton();
@@ -86,13 +84,12 @@ void oxygenMenu::Update()
 	if (!oxygenMeter || !oxygenMeter->uiMovie)
 		return;
 
-	applySettings();
-
 	static bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
 	auto fillPct = detail::get_player_breath_pct();
 
 	if (fillPct) {
-		
+		applyLayout();
+
 		const RE::GFxValue testAmount = *fillPct;
 
 		if (!holding_breath) {
@@ -123,12 +120,9 @@ void oxygenMenu::Update()
 
 }
 
-// apply location, rotations and scale settings to menu on load.
-void oxygenMenu::applySettings()
+// apply location, rotations and scale settings to menu.
+void oxygenMenu::applyLayout()
 {
-	if (settingsApplied)
-		return;
-
 	RE::GPtr<RE::IMenu> oxygenMeter = RE::UI::GetSingleton()->GetMenu(oxygenMenu::MENU_NAME);
 	if (!oxygenMeter || !oxygenMeter->uiMovie)
 		return;
@@ -141,7 +135,7 @@ void oxygenMenu::applySettings()
 	RE::GFxValue posArray[5]{ widget_xpos, widget_ypos, widget_rotation, widget_xscale, widget_yscale };
 	oxygenMeter->uiMovie->Invoke("oxygen.setLocation", nullptr, posArray, 5);
 
-	settingsApplied = true;
+	oxygenMeter->uiMovie->SetVariableDouble("oxygen.setup", 1);
 }
 
 // Every time a new frame of the menu is rendered call the update function.

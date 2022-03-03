@@ -14,8 +14,7 @@ public:
 	static void Show();
 	static void Hide();
 	static void Update();
-	static void applySettings();
-	static bool settingsApplied;
+	static void applyLayout();
 
     static RE::stl::owner<RE::IMenu*> Creator() { return new oxygenMenu(); }
 
