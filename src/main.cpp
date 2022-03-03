@@ -7,6 +7,8 @@ const SKSE::MessagingInterface* g_messaging = nullptr;
 const SKSE::LoadInterface* g_LoadInterface = nullptr;
 const SKSE::QueryInterface* g_QueryInterface = nullptr;
 
+// I've made this file very messy, I should really go through and clean it up.
+
 static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
 	switch (message->type) {
@@ -46,7 +48,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "Oxygen Meter";
+	a_info->name = "Oxygen Meter 2";
 	a_info->version = Version::MAJOR;
 
 	if (a_skse->IsEditor()) {

@@ -14,15 +14,15 @@ public:
 	static void Show();
 	static void Hide();
 	static void Update();
+	static void applySettings();
+	static bool settingsApplied;
 
     static RE::stl::owner<RE::IMenu*> Creator() { return new oxygenMenu(); }
 
 	void AdvanceMovie(float a_interval, std::uint32_t a_currentTime) override;
-
 private:
 	static inline bool holding_breath{ false };
 	static inline bool drowning{ false };
-	static inline double alphaValue{ 100.0 };
 
 private:
 	class Logger : public RE::GFxLog

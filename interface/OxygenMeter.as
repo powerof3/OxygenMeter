@@ -35,16 +35,17 @@ class OxygenMeter extends MovieClip
 	
 	function onLoad(): Void
 	{
+		//setLocation(960, 960, 0, 150, 150);
 		this.gotoAndStop("hide");
-		//doFadeOut();
-		//doShow();
 	}
 	
-	public function setLocation(xpos: Number, ypos: Number, rot: Number): Void
+	public function setLocation(xpos: Number, ypos: Number, rot: Number, xscale: Number, yscale: Number): Void
 	{
 		this._x = xpos;
 		this._y = ypos;
 		this._rotation = rot;
+		this._xscale = xscale;
+		this._yscale = yscale;
 	}
 	
 	public function doFadeOut(): Void

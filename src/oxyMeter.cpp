@@ -2,6 +2,8 @@
 #include "oxyMeter.h"
 #include "Settings.h"
 
+bool oxygenMenu::settingsApplied;
+
 oxygenMenu::oxygenMenu()
 {
 	auto scaleformManager = RE::BSScaleformManager::GetSingleton();
@@ -77,22 +79,20 @@ void oxygenMenu::Hide()
 	}
 }
 
+// pass the breath meter percents to the scaleform menu using invokes, and tell the menu when to show or hide itself (as in within the scaleform, not the IMenu kHide flag)
 void oxygenMenu::Update()
 {
-	RE::GPtr<RE::IMenu> oxygenMenu = RE::UI::GetSingleton()->GetMenu(oxygenMenu::MENU_NAME);
-	if (!oxygenMenu || !oxygenMenu->uiMovie)
+	RE::GPtr<RE::IMenu> oxygenMeter = RE::UI::GetSingleton()->GetMenu(oxygenMenu::MENU_NAME);
+	if (!oxygenMeter || !oxygenMeter->uiMovie)
 		return;
 
-	const RE::GFxValue widget_xpos = Settings::GetSingleton()->widget_xpos;
-	const RE::GFxValue widget_ypos = Settings::GetSingleton()->widget_ypos;
-	const RE::GFxValue widget_rotation = Settings::GetSingleton()->widget_rotation;
-	RE::GFxValue posArray[3]{ widget_xpos, widget_ypos, widget_rotation };
+	applySettings();
 
 	static bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
 	auto fillPct = detail::get_player_breath_pct();
-	oxygenMenu->uiMovie->Invoke("oxygen.setLocation", nullptr, posArray, 3);
 
 	if (fillPct) {
+		
 		const RE::GFxValue testAmount = *fillPct;
 
 		if (!holding_breath) {
@@ -100,12 +100,12 @@ void oxygenMenu::Update()
 		}
 
 		if (drowning && fadeWhenDrowning) {
-			oxygenMenu->uiMovie->Invoke("oxygen.doFadeOut", nullptr, &testAmount, 1);
+			oxygenMeter->uiMovie->Invoke("oxygen.doFadeOut", nullptr, &testAmount, 1);
 			return;
 		}
 
-		oxygenMenu->uiMovie->Invoke("oxygen.doShow", nullptr, nullptr, 0);
-		oxygenMenu->uiMovie->Invoke("oxygen.setMeterPercent", nullptr, &testAmount, 1);
+		oxygenMeter->uiMovie->Invoke("oxygen.doShow", nullptr, nullptr, 0);
+		oxygenMeter->uiMovie->Invoke("oxygen.setMeterPercent", nullptr, &testAmount, 1);
 
 		if (*fillPct == 0.0) {
 			drowning = true;
@@ -116,13 +116,35 @@ void oxygenMenu::Update()
 			holding_breath = false;
 			drowning = false;
 			const RE::GFxValue refill = 100;
-			oxygenMenu->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &refill, 1);
-			oxygenMenu->uiMovie->Invoke("oxygen.doFadeOut", nullptr, nullptr, 0);
+			oxygenMeter->uiMovie->Invoke("oxygen.updateMeterPercent", nullptr, &refill, 1);
+			oxygenMeter->uiMovie->Invoke("oxygen.doFadeOut", nullptr, nullptr, 0);
 		}
 	}
 
 }
 
+// apply location, rotations and scale settings to menu on load.
+void oxygenMenu::applySettings()
+{
+	if (settingsApplied)
+		return;
+
+	RE::GPtr<RE::IMenu> oxygenMeter = RE::UI::GetSingleton()->GetMenu(oxygenMenu::MENU_NAME);
+	if (!oxygenMeter || !oxygenMeter->uiMovie)
+		return;
+
+	const RE::GFxValue widget_xpos = Settings::GetSingleton()->widget_xpos;
+	const RE::GFxValue widget_ypos = Settings::GetSingleton()->widget_ypos;
+	const RE::GFxValue widget_rotation = Settings::GetSingleton()->widget_rotation;
+	const RE::GFxValue widget_xscale = Settings::GetSingleton()->widget_xscale;
+	const RE::GFxValue widget_yscale = Settings::GetSingleton()->widget_yscale;
+	RE::GFxValue posArray[5]{ widget_xpos, widget_ypos, widget_rotation, widget_xscale, widget_yscale };
+	oxygenMeter->uiMovie->Invoke("oxygen.setLocation", nullptr, posArray, 5);
+
+	settingsApplied = true;
+}
+
+// Every time a new frame of the menu is rendered call the update function.
 void oxygenMenu::AdvanceMovie(float a_interval, std::uint32_t a_currentTime)
 {
 	oxygenMenu::Update();

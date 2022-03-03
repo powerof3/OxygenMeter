@@ -32,8 +32,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STR
 # ---- Project ----
 
 project(
-	po3_OxygenMeter
-	VERSION 1.2.0
+	po3_OxygenMeter2
+	VERSION 1.0.0
 	LANGUAGES CXX
 )
 
