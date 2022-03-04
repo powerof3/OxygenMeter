@@ -134,8 +134,6 @@ void oxygenMenu::applyLayout()
 	const RE::GFxValue widget_yscale = Settings::GetSingleton()->widget_yscale;
 	RE::GFxValue posArray[5]{ widget_xpos, widget_ypos, widget_rotation, widget_xscale, widget_yscale };
 	oxygenMeter->uiMovie->Invoke("oxygen.setLocation", nullptr, posArray, 5);
-
-	oxygenMeter->uiMovie->SetVariableDouble("oxygen.setup", 1);
 }
 
 // Every time a new frame of the menu is rendered call the update function.
