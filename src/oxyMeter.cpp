@@ -121,7 +121,7 @@ void oxygenMenu::Update()
 }
 
 // apply location, rotations and scale settings to menu.
-void oxygenMenu::applyLayout(RE::GPtr<RE::IMenu> oxygenMeter)
+void oxygenMenu::ApplyLayout(RE::GPtr<RE::IMenu> oxygenMeter)
 {
 	if (!oxygenMeter || !oxygenMeter->uiMovie)
 		return;
