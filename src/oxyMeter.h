@@ -13,6 +13,7 @@ public:
     static void Register();
 	static void Show();
 	static void Hide();
+	static void toggleVisibility(bool mode);
 	static void Update();
 	static void ApplyLayout(RE::GPtr<RE::IMenu> oxygenMeter);
 

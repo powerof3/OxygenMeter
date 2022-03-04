@@ -20,7 +20,7 @@ RE::BSEventNotifyControl MenuOpenCloseEventHandler::ProcessEvent(const RE::MenuO
 {
 	auto mName = a_event->menuName;
 	auto ui = RE::UI::GetSingleton();
-
+	
 		if (mName == RE::JournalMenu::MENU_NAME ||
 			mName == RE::InventoryMenu::MENU_NAME ||
 			mName == RE::MapMenu::MENU_NAME ||
@@ -35,9 +35,9 @@ RE::BSEventNotifyControl MenuOpenCloseEventHandler::ProcessEvent(const RE::MenuO
 			mName == RE::MagicMenu::MENU_NAME ||
 			mName == "CustomMenu") {
 			if (a_event->opening) {
-				oxygenMenu::Hide();
+				oxygenMenu::toggleVisibility(false);
 			} else if (!ui->IsMenuOpen(RE::TweenMenu::MENU_NAME)) {
-				oxygenMenu::Show();
+				oxygenMenu::toggleVisibility(true);
 			}
 		}
 	return RE::BSEventNotifyControl::kContinue;
