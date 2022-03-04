@@ -14,7 +14,7 @@ public:
 	static void Show();
 	static void Hide();
 	static void Update();
-	static void applyLayout();
+	static void applyLayout(RE::GPtr<RE::IMenu> oxygenMeter);
 
     static RE::stl::owner<RE::IMenu*> Creator() { return new oxygenMenu(); }
 

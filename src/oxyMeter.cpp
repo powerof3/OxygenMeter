@@ -88,7 +88,7 @@ void oxygenMenu::Update()
 	auto fillPct = detail::get_player_breath_pct();
 
 	if (fillPct) {
-		applyLayout();
+		applyLayout(oxygenMeter);
 
 		const RE::GFxValue testAmount = *fillPct;
 
@@ -121,9 +121,8 @@ void oxygenMenu::Update()
 }
 
 // apply location, rotations and scale settings to menu.
-void oxygenMenu::applyLayout()
+void oxygenMenu::applyLayout(RE::GPtr<RE::IMenu> oxygenMeter)
 {
-	RE::GPtr<RE::IMenu> oxygenMeter = RE::UI::GetSingleton()->GetMenu(oxygenMenu::MENU_NAME);
 	if (!oxygenMeter || !oxygenMeter->uiMovie)
 		return;
 
