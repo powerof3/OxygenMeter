@@ -1,114 +1,29 @@
 #include "Settings.h"
+#include "SKSE/API.h"
+#include "oxyMeter.h"
+#include "Events.h"
 
-namespace OxygenMeter
+const SKSE::MessagingInterface* g_messaging = nullptr;
+const SKSE::LoadInterface* g_LoadInterface = nullptr;
+const SKSE::QueryInterface* g_QueryInterface = nullptr;
+
+// I've made this file very messy, I should really go through and clean it up.
+
+static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
-	struct Update
-	{
-		static void thunk(RE::HUDChargeMeter* a_this)
-		{
-			static bool useLeftMeter{ static_cast<bool>(Settings::GetSingleton()->useLeftMeter) };
-			static bool fadeWhenDrowning{ Settings::GetSingleton()->fadeWhenDrowning };
-			
-			auto fillPct = detail::get_player_breath_pct();
-			if (fillPct) {
-				if (!holding_breath) {
-					holding_breath = true;
+	switch (message->type) {
+	case SKSE::MessagingInterface::kDataLoaded:
+		MenuOpenCloseEventHandler::Register();
+		oxygenMenu::Register();
+		break;
 
-					alphaValue = detail::set_meter_alpha(useLeftMeter, 100.0);
-					if (alphaValue == 100.0) {
-						a_this->root.Invoke("FadeOutChargeMeters");
-					}
-				}
+	case SKSE::MessagingInterface::kNewGame:
+		oxygenMenu::Show();
+		break;
 
-				if (drowning && fadeWhenDrowning) {
-					a_this->root.Invoke("FadeOutChargeMeters");
-					return;
-				}
-
-				std::array<RE::GFxValue, 4> array{ *fillPct, true, useLeftMeter, true };
-				a_this->root.Invoke("SetChargeMeterPercent", nullptr, array);
-
-				if (*fillPct == 0.0) {
-					drowning = true;
-				}
-			} else {
-				if (holding_breath || drowning) {
-					holding_breath = false;
-					drowning = false;
-
-					if (alphaValue == 0.0) {
-						detail::set_meter_alpha(useLeftMeter, alphaValue);
-					} else {
-						a_this->root.Invoke("FadeOutChargeMeters");
-					}
-				}
-
-				func(a_this);
-			}
-		}
-		static inline REL::Relocation<decltype(thunk)> func;
-
-		static inline constexpr std::size_t size = 0x1;
-
-	private:
-		struct detail
-		{
-			static double set_meter_alpha(bool a_useLeftMeter, double a_value)
-			{
-				if (auto movie = RE::UI::GetSingleton()->GetMovieView(RE::HUDMenu::MENU_NAME); movie) {
-					auto path = a_useLeftMeter ?
-                                    left_path :
-                                    right_path;
-
-					auto value = movie->GetVariableDouble(path);
-					if (value != a_value) {
-						movie->SetVariableDouble(path, a_value);
-						return value;
-					}
-				}
-
-				return 100.0f;
-			}
-
-			static float get_total_breath_time()
-			{
-				const auto gamesetting = RE::GameSettingCollection::GetSingleton();
-				return (50.0f * gamesetting->GetSetting("fActorSwimBreathMult")->GetFloat()) + gamesetting->GetSetting("fActorSwimBreathBase")->GetFloat();
-			}
-
-			static float get_remaining_breath(RE::AIProcess* a_process)
-			{
-				auto high = a_process ? a_process->high : nullptr;
-				return high ? high->breathTimer : 20.0f;
-			}
-
-			static std::optional<double> get_player_breath_pct()
-			{
-				auto player = RE::PlayerCharacter::GetSingleton();
-				if (player->IsPointDeepUnderWater(player->GetPositionZ(), player->GetParentCell()) < 0.875f || player->IsInvulnerable() || player->GetActorValue(RE::ActorValue::kWaterBreathing) > 0.0001f) {
-					return std::nullopt;
-				}
-
-				float totalBreathTime = detail::get_total_breath_time();
-				float remainingBreath = detail::get_remaining_breath(player->currentProcess);
-
-				return (remainingBreath / totalBreathTime) * 100.0;
-			}
-
-		private:
-			static inline const char* left_path{ "_root.HUDMovieBaseInstance.BottomLeftLockInstance._alpha" };
-			static inline const char* right_path{ "_root.HUDMovieBaseInstance.BottomRightLockInstance._alpha" };
-		};
-
-		static inline bool holding_breath{ false };
-		static inline bool drowning{ false };
-
-		static inline double alphaValue{ 100.0 };
-	};
-
-	inline void Install()
-	{
-		stl::write_vfunc<RE::HUDChargeMeter, Update>();
+	case SKSE::MessagingInterface::kPostLoadGame:
+		oxygenMenu::Show();
+		break;
 	}
 }
 
@@ -133,7 +48,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "Oxygen Meter";
+	a_info->name = "Oxygen Meter 2";
 	a_info->version = Version::MAJOR;
 
 	if (a_skse->IsEditor()) {
@@ -158,7 +73,19 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	Settings::GetSingleton()->Load();
 
-	OxygenMeter::Install();
+	g_messaging = reinterpret_cast<SKSE::MessagingInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kMessaging));
+	if (!g_messaging) {
+		logger::critical("Failed to load messaging interface! This error is fatal, plugin will not load.");
+		return false;
+	}
+
+	auto papyrus = reinterpret_cast<SKSE::PapyrusInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kPapyrus));
+	if (!papyrus) {
+		logger::critical("Failed to load scripting interface! This error is fatal, plugin will not load.");
+		return false;
+	}
+
+	g_messaging->RegisterListener("SKSE", SKSEMessageHandler);
 
 	return true;
 }

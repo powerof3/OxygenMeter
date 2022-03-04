@@ -32,8 +32,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STR
 # ---- Project ----
 
 project(
-	po3_OxygenMeter
-	VERSION 1.2.0
+	po3_OxygenMeter2
+	VERSION 1.0.0
 	LANGUAGES CXX
 )
 
@@ -123,7 +123,7 @@ add_library(
 	${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
-)
+ "src/Events.cpp" "src/Events.h")
 
 target_compile_features(
 	${PROJECT_NAME}
