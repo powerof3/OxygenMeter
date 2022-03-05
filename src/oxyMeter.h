@@ -11,10 +11,12 @@ public:
     oxygenMenu();
 
     static void Register();
-	static void Show();
-	static void Hide();
+	static void toggleVisibility(bool mode);
+	static bool getVisibility();
 	static void Update();
 	static void ApplyLayout(RE::GPtr<RE::IMenu> oxygenMeter);
+	static void Hide();
+	static void Show();
 
     static RE::stl::owner<RE::IMenu*> Creator() { return new oxygenMenu(); }
 
@@ -22,6 +24,7 @@ public:
 private:
 	static inline bool holding_breath{ false };
 	static inline bool drowning{ false };
+	static inline bool isVisible{ true };
 
 private:
 	class Logger : public RE::GFxLog

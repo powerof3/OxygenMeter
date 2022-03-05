@@ -6,12 +6,13 @@ oxygenMenu::oxygenMenu()
 {
 	auto scaleformManager = RE::BSScaleformManager::GetSingleton();
 
-	inputContext = Context::kNone;
-	depthPriority = 1;
+	depthPriority = 0;
 
+	menuFlags.set(RE::UI_MENU_FLAGS::kAlwaysOpen);
 	menuFlags.set(RE::UI_MENU_FLAGS::kRequiresUpdate);
 	menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving);
-	menuFlags.set(RE::UI_MENU_FLAGS::kCustomRendering);
+	//menuFlags.set(RE::UI_MENU_FLAGS::kCustomRendering);
+	inputContext = Context::kNone;
 
 	if (uiMovie) {
 		uiMovie->SetMouseCursorCount(0);  // disable input
@@ -56,8 +57,6 @@ void oxygenMenu::Register()
 	auto ui = RE::UI::GetSingleton();
 	if (ui) {
 		ui->Register(MENU_NAME, Creator);
-
-		oxygenMenu::Show();
 	}
 }
 
@@ -77,6 +76,39 @@ void oxygenMenu::Hide()
 	}
 }
 
+#if false
+bool oxygenMenu::getHidden()
+{
+	auto ui = RE::UI::GetSingleton();
+	if (!ui)
+		return;
+
+	auto overlayMenu = ui->GetMenu(oxygenMenu::MENU_NAME);
+	if (!overlayMenu || !overlayMenu->uiMovie)
+		return;
+
+	overlayMenu->menuFlags.all{}
+}
+#endif
+void oxygenMenu::toggleVisibility(bool mode)
+{
+	auto ui = RE::UI::GetSingleton();
+	if (!ui)
+		return;
+
+	auto overlayMenu = ui->GetMenu(oxygenMenu::MENU_NAME);
+	if (!overlayMenu || !overlayMenu->uiMovie)
+		return;
+
+	overlayMenu->uiMovie->SetVisible(mode);
+	isVisible = mode;
+}
+
+bool oxygenMenu::getVisibility()
+{
+	return isVisible;
+}
+
 // pass the breath meter percents to the scaleform menu using invokes, and tell the menu when to show or hide itself (as in within the scaleform, not the IMenu kHide flag)
 void oxygenMenu::Update()
 {
@@ -88,7 +120,7 @@ void oxygenMenu::Update()
 	auto fillPct = detail::get_player_breath_pct();
 
 	if (fillPct) {
-		applyLayout(oxygenMeter);
+		ApplyLayout(oxygenMeter);
 
 		const RE::GFxValue testAmount = *fillPct;
 
