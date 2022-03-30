@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(NAME "po3_oxygenMeter2")
-set(VERSION 1.3.0)
+set(VERSION 1.0.0)
 set(VR_VERSION 1)
 set(AE_VERSION 1)
 
@@ -78,7 +78,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STR
 
 project(
 	po3_OxygenMeter2
-	VERSION 1.3.0
+	VERSION 1.0.0
 	LANGUAGES CXX
 )
 
