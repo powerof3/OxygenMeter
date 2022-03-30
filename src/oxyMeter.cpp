@@ -88,7 +88,7 @@ void oxygenMenu::Update()
 	auto fillPct = detail::get_player_breath_pct();
 
 	if (fillPct) {
-		applyLayout(oxygenMeter);
+		ApplyLayout(oxygenMeter);
 
 		const RE::GFxValue testAmount = *fillPct;
 
