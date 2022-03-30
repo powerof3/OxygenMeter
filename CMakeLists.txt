@@ -1,14 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-set(NAME "po3_OxygenMeter2")
-set(VERSION 1.0.2)
-set(VR_VERSION 1)
-set(AE_VERSION 1)
 
 # ---- Options ----
 
-option(COPY_BUILD "Copy the build output to the Skyrim directory." OFF)
-option(BUILD_SKYRIMVR "Build for Skyrim VR" OFF)
-option(BUILD_SKYRIMAE "Build for Skyrim AE" ON)
+option(COPY_BUILD "Copy the build output to the Skyrim directory." TRUE)
 
 # ---- Cache build vars ----
 
@@ -18,47 +12,9 @@ macro(set_from_environment VARIABLE)
 	endif ()
 endmacro()
 
-macro(find_commonlib_path)
-	if (CommonLibName AND NOT ${CommonLibName} STREQUAL "")
-		# Check extern
-		find_path(CommonLibPath
-		include/REL/Relocation.h
-		PATHS external/${CommonLibName})
-		if (${CommonLibPath} STREQUAL "CommonLibPath-NOTFOUND")
-			#Check path
-			set_from_environment(${CommonLibName}Path)
-			set(CommonLibPath ${${CommonLibName}Path})
-		endif()
-	endif()
-endmacro()
-
+set_from_environment(Skyrim64Path)
 set_from_environment(VCPKG_ROOT)
-if(BUILD_SKYRIMAE)
-	add_compile_definitions(SKYRIM_AE)
-	set(CommonLibName "CommonLibSSE")
-	set_from_environment(SkyrimAEPath)
-	set(SkyrimPath ${SkyrimAEPath})
-	set(SkyrimVersion "Skyrim AE")
-	set(VERSION ${VERSION}.${AE_VERSION})
-elseif(BUILD_SKYRIMVR)
-	add_compile_definitions(SKYRIMVR)
-	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
-	set(CommonLibName "CommonLibVR")
-	set_from_environment(SkyrimVRPath)
-	set(SkyrimPath ${SkyrimVRPath})
-	set(SkyrimVersion "Skyrim VR")
-	set(VERSION ${VERSION}.${VR_VERSION})
-else()
-	set(CommonLibName "CommonLibSSE")
-	set_from_environment(Skyrim64Path)
-	set(SkyrimPath ${Skyrim64Path})
-	set(SkyrimVersion "Skyrim SSE")
-endif()
-find_commonlib_path()
-message(
-	STATUS
-	"Building ${NAME} ${VERSION} for ${SkyrimVersion} at ${SkyrimPath} with ${CommonLibName} at ${CommonLibPath}."
-)
+set_from_environment(CommonLibSSEPath)
 
 if (DEFINED VCPKG_ROOT)
 	set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
@@ -71,6 +27,7 @@ else ()
 endif ()
 
 set(Boost_USE_STATIC_RUNTIME OFF CACHE BOOL "")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
 # ---- Project ----
 
@@ -107,17 +64,7 @@ add_compile_definitions(
 	SKSE_SUPPORT_XBYAK
 )
 
-if (BUILD_SKYRIMAE)
-	add_compile_definitions(
-		SKYRIM_SUPPORT_AE
-	)
-endif()
-
 if (MSVC)
-	add_compile_definitions(
-		_UNICODE
-	)
-
 	if (NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
 		add_compile_options(
 			/MP	# Build with Multiple Processes
@@ -129,7 +76,6 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 
 set(Boost_USE_STATIC_LIBS ON)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
 # ---- Dependencies ----
 
