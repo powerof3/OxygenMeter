@@ -13,8 +13,8 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
 	switch (message->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
-		oxygenMenu::Register();
 		MenuOpenCloseEventHandler::Register();
+		oxygenMenu::Register();
 		break;
 
 	case SKSE::MessagingInterface::kNewGame:
