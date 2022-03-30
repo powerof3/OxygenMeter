@@ -15,6 +15,7 @@ public:
 	static void Hide();
 	static void Update();
 	static void ApplyLayout(RE::GPtr<RE::IMenu> oxygenMeter);
+	static void ToggleVisibility(bool mode);
 
     static RE::stl::owner<RE::IMenu*> Creator() { return new oxygenMenu(); }
 
