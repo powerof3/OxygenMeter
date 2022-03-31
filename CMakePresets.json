@@ -52,11 +52,16 @@
         "vcpkg",
         "windows"
       ],
+      "hidden": true,
       "name": "vs2019-windows-vcpkg"
     },
     {
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX $penv{CXXFLAGS}"
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX $penv{CXXFLAGS}",
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Debug"
+        }
       },
       "generator": "Visual Studio 17 2022",
       "inherits": [
@@ -64,7 +69,24 @@
         "vcpkg",
         "windows"
       ],
-      "name": "vs2022-windows-vcpkg",
+      "name": "vs2022-windows-vcpkg-debug",
+      "toolset": "v143"
+    },
+    {
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX $penv{CXXFLAGS}",
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
+        }
+      },
+      "generator": "Visual Studio 17 2022",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows"
+      ],
+      "name": "vs2022-windows-vcpkg-release",
       "toolset": "v143"
     }
   ],
