@@ -8,7 +8,7 @@ set(AE_VERSION 1)
 
 option(COPY_BUILD "Copy the build output to the Skyrim directory." TRUE)
 option(BUILD_SKYRIMVR "Build for Skyrim VR" OFF)
-option(BUILD_SKYRIMAE "Build for Skyrim AE" OFF)
+option(BUILD_SKYRIMAE "Build for Skyrim AE" TRUE)
 
 # ---- Cache build vars ----
 
