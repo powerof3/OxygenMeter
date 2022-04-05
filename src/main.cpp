@@ -31,14 +31,15 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("po3_oxygenMeter2");
-	v.AuthorName("po3 and osmosiswrench");
+	v.PluginName("Oxygen Meter 2");
+	v.AuthorName("powerofthree and OsmosisWrench");
 	v.UsesAddressLibrary(true);
 	v.CompatibleVersions({ SKSE::RUNTIME_LATEST });
 
 	return v;
 }();
 #else
+
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	auto path = logger::log_directory();
@@ -76,6 +77,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 
 	return true;
 }
+
 #endif
 
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
