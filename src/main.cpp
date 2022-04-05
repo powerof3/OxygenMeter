@@ -31,7 +31,7 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("Oxygen Meter 2");
+	v.PluginName("po3_OxygenMeter2");
 	v.AuthorName("powerofthree and OsmosisWrench");
 	v.UsesAddressLibrary(true);
 	v.CompatibleVersions({ SKSE::RUNTIME_LATEST });
@@ -87,13 +87,12 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	SKSE::Init(a_skse);
 
 	Settings::GetSingleton()->Load();
-
 	g_messaging = reinterpret_cast<SKSE::MessagingInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kMessaging));
 	if (!g_messaging) {
 		logger::critical("Failed to load messaging interface! This error is fatal, plugin will not load.");
 		return false;
 	}
-
+	logger::critical("stuff idk");
 	auto papyrus = reinterpret_cast<SKSE::PapyrusInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kPapyrus));
 	if (!papyrus) {
 		logger::critical("Failed to load scripting interface! This error is fatal, plugin will not load.");

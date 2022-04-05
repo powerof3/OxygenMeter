@@ -8,7 +8,7 @@ set(AE_VERSION 1)
 
 option(COPY_BUILD "Copy the build output to the Skyrim directory." TRUE)
 option(BUILD_SKYRIMVR "Build for Skyrim VR" OFF)
-option(BUILD_SKYRIMAE "Build for Skyrim AE" OFF)
+option(BUILD_SKYRIMAE "Build for Skyrim AE" TRUE)
 
 # ---- Cache build vars ----
 
@@ -108,8 +108,16 @@ endif()
 add_compile_definitions(
 	SKSE_SUPPORT_XBYAK
 )
+if (BUILD_SKYRIMAE)
+	add_compile_definitions(
+		SKYRIM_SUPPORT_AE
+	)
+endif()
 
 if (MSVC)
+add_compile_definitions(
+	_UNICODE
+)
 	if (NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
 		add_compile_options(
 			/MP	# Build with Multiple Processes
