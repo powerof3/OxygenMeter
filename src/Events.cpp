@@ -21,6 +21,7 @@ RE::BSEventNotifyControl MenuOpenCloseEventHandler::ProcessEvent(const RE::MenuO
 {
 		// from ersh TrueHud pretty much verbatim
 	if (a_event) {
+		logger::info("Menu: {} :: {}",a_event->menuName.c_str(), a_event->opening);
 		if (a_event->menuName == RE::HUDMenu::MENU_NAME) {
 			if (a_event->opening) {
 				oxygenMenu::Show();
@@ -32,6 +33,9 @@ RE::BSEventNotifyControl MenuOpenCloseEventHandler::ProcessEvent(const RE::MenuO
 			logger::info("showing menu when racemenu closes");
 		} else if (a_event->menuName == RE::LoadingMenu::MENU_NAME && !a_event->opening) {
 			oxygenMenu::Show();
+		}
+		if (a_event->menuName == RE::ContainerMenu::MENU_NAME && a_event->opening){
+			oxygenMenu::Hide();
 		}
 		if (a_event->menuName == RE::JournalMenu::MENU_NAME) {
 			Settings::GetSingleton()->Load();

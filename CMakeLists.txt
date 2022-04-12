@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 set(NAME "po3_oxygenMeter2")
-set(VERSION 1.0.0)
+set(VERSION 1.0.4)
 set(VR_VERSION 1)
 set(AE_VERSION 1)
 
 # ---- Options ----
 
-option(COPY_BUILD "Copy the build output to the Skyrim directory." TRUE)
+option(COPY_BUILD "Copy the build output to the Skyrim directory." OFF)
 option(BUILD_SKYRIMVR "Build for Skyrim VR" OFF)
 option(BUILD_SKYRIMAE "Build for Skyrim AE" OFF)
 
@@ -78,7 +78,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STR
 
 project(
 	po3_OxygenMeter2
-	VERSION 1.0.0
+	VERSION 1.0.4
 	LANGUAGES CXX
 )
 
