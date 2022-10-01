@@ -21,7 +21,7 @@ macro(find_commonlib_path)
 		# Check extern
 		find_path(CommonLibPath
 		include/REL/Relocation.h
-		PATHS external/${CommonLibName})
+		PATHS extern/${CommonLibName})
 		if (${CommonLibPath} STREQUAL "CommonLibPath-NOTFOUND")
 			#Check path
 			set_from_environment(${CommonLibName}Path)
@@ -128,9 +128,11 @@ if (DEFINED CommonLibPath AND NOT ${CommonLibPath} STREQUAL "" AND IS_DIRECTORY 
 else ()
 	message(
 		FATAL_ERROR
-		"Variable ${CommonLibName}Path is not set."
+		"Variable ${CommonLibName}Path is not set or in extern/."
 	)
 endif()
+
+find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
 
 # ---- Add source files ----
 
@@ -176,14 +178,19 @@ target_include_directories(
 	PRIVATE
 		${CMAKE_CURRENT_BINARY_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
-		${CommonLibPath}/x64/Release
+		${SIMPLEINI_INCLUDE_DIRS}
 )
-
 
 target_link_libraries(
 	${PROJECT_NAME}
 	PRIVATE
 		${CommonLibName}::${CommonLibName}
+)
+
+target_precompile_headers(
+	${PROJECT_NAME}
+	PRIVATE
+		src/PCH.h
 )
 
 if (MSVC)
@@ -241,12 +248,6 @@ if (MSVC)
 	string(REPLACE "/Ob2" "/Ob3" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 	
 endif ()
-
-target_precompile_headers(
-	${PROJECT_NAME}
-	PRIVATE
-		src/PCH.h
-)
 
 # ---- Post build ----
 
