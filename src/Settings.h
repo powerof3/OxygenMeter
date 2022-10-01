@@ -30,31 +30,16 @@ public:
 private:
 	struct detail
 	{
-		static void get_value(CSimpleIniA& a_ini, std::uint32_t& a_value, const char* a_section, const char* a_key, const char* a_comment)
+		template <class T>
+		static void get_value(CSimpleIniA& a_ini, T& a_value, const char* a_section, const char* a_key, const char* a_comment)
 		{
-			try {
-				a_value = string::lexical_cast<std::uint32_t>(a_ini.GetValue(a_section, a_key, "0"));
+			if constexpr (std::is_same_v<T, bool>) {
+				a_value = a_ini.GetBoolValue(a_section, a_key, a_value);
+				a_ini.SetBoolValue(a_section, a_key, a_value, a_comment);
+			} else if constexpr (std::is_arithmetic_v<T>) {
+				a_value = string::lexical_cast<T>(a_ini.GetValue(a_section, a_key, std::to_string(a_value).c_str()));
 				a_ini.SetValue(a_section, a_key, std::to_string(a_value).c_str(), a_comment);
-			} catch (...) {
 			}
 		}
-
-		static void get_value(CSimpleIniA& a_ini, float& a_value, const char* a_section, const char* a_key, const char* a_comment)
-		{
-			a_value = static_cast<float>(a_ini.GetDoubleValue(a_section, a_key, a_value));
-			a_ini.SetDoubleValue(a_section, a_key, a_value, a_comment);
-		}
-
-		static void get_value(CSimpleIniA& a_ini, bool& a_value, const char* a_section, const char* a_key, const char* a_comment)
-		{
-			a_value = a_ini.GetBoolValue(a_section, a_key, a_value);
-			a_ini.SetBoolValue(a_section, a_key, a_value, a_comment);
-		};
-
-		static void get_value(CSimpleIniA& a_ini, std::string& a_value, const char* a_section, const char* a_key, const char* a_comment)
-		{
-			a_value = a_ini.GetValue(a_section, a_key, a_value.c_str());
-			a_ini.SetValue(a_section, a_key, a_value.c_str(), a_comment);
-		};
 	};
 };

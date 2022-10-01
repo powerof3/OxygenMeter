@@ -18,7 +18,9 @@ using namespace std::literals;
 
 namespace stl
 {
-	template <class F, class T>
+	using namespace SKSE::stl;
+
+    template <class F, class T>
 	void write_vfunc()
 	{
 		REL::Relocation<std::uintptr_t> vtbl{ F::VTABLE[0] };
