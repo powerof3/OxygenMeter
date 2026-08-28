@@ -8,7 +8,6 @@
 #include "SKSE/SKSE.h"
 
 #include <spdlog/sinks/basic_file_sink.h>
-#include <xbyak/xbyak.h>
 
 using namespace std::literals;
 using namespace RE::literals;

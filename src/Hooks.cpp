@@ -96,6 +96,10 @@ namespace OxygenMeter
 				}
 
 				const auto totalBreathTime = get_total_breath_time();
+				if (totalBreathTime <= 0.0f) {
+					return std::nullopt;
+				}
+
 				const auto remainingBreath = get_remaining_breath(player->currentProcess);
 
 				return (remainingBreath / totalBreathTime) * 100.0;

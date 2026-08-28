@@ -8,8 +8,7 @@
     {
       "name": "commonlib-shared",
       "features": [
-        "ini",
-        "xbyak"
+        "ini"
       ]
     },
     "spdlog"
