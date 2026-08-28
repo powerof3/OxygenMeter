@@ -7,17 +7,20 @@ namespace OxygenMeter
 	{
 		static void thunk(RE::HUDChargeMeter* a_this)
 		{
+			const auto settings = Settings::GetSingleton();
+			const bool useLeftMeter = settings->useLeftMeter == 1;
+
 			if (auto fillPct = detail::get_player_breath_pct(); fillPct) {
 				if (!holding_breath) {
 					holding_breath = true;
 
-					alphaValue = detail::set_meter_alpha(100.0);
+					alphaValue = detail::set_meter_alpha(100.0, useLeftMeter);
 					if (alphaValue == 100.0) {
 						a_this->root.Invoke("FadeOutChargeMeters");
 					}
 				}
 
-				if (drowning && Settings::GetSingleton()->fadeWhenDrowning) {
+				if (drowning && settings->fadeWhenDrowning) {
 					a_this->root.Invoke("FadeOutChargeMeters");
 					return;
 				}
@@ -25,7 +28,7 @@ namespace OxygenMeter
 				const std::array<RE::GFxValue, 4> array{
 					*fillPct,
 					true,
-					Settings::GetSingleton()->useLeftMeter == 1,
+					useLeftMeter,
 					true
 				};
 
@@ -40,7 +43,7 @@ namespace OxygenMeter
 					drowning = false;
 
 					if (alphaValue == 0.0) {
-						detail::set_meter_alpha(alphaValue);
+						detail::set_meter_alpha(alphaValue, useLeftMeter);
 					} else {
 						a_this->root.Invoke("FadeOutChargeMeters");
 					}
@@ -49,17 +52,17 @@ namespace OxygenMeter
 				func(a_this);
 			}
 		}
-		static inline REL::Relocation<decltype(thunk)> func;
 
-		static inline constexpr std::size_t size = 0x1;
+		static inline REL::Relocation<decltype(thunk)> func;
+		static inline constexpr std::size_t            idx = 0x1;
 
 	private:
 		struct detail
 		{
-			static double set_meter_alpha(double a_value)
+			static double set_meter_alpha(double a_value, bool a_useLeftMeter)
 			{
 				if (auto movie = RE::UI::GetSingleton()->GetMovieView(RE::HUDMenu::MENU_NAME); movie) {
-					auto path = Settings::GetSingleton()->useLeftMeter == 1 ?
+					auto path = a_useLeftMeter ?
 					                left_path :
 					                right_path;
 
@@ -75,8 +78,7 @@ namespace OxygenMeter
 
 			static float get_total_breath_time()
 			{
-				const auto gamesetting = RE::GameSettingCollection::GetSingleton();
-				return (50.0f * gamesetting->GetSetting("fActorSwimBreathMult")->GetFloat()) + gamesetting->GetSetting("fActorSwimBreathBase")->GetFloat();
+				return (50.0f * *"fActorSwimBreathMult"_gs) + *"fActorSwimBreathBase"_gs;
 			}
 
 			static float get_remaining_breath(RE::AIProcess* a_process)
@@ -100,8 +102,8 @@ namespace OxygenMeter
 			}
 
 		private:
-			static inline const char* left_path{ "_root.HUDMovieBaseInstance.BottomLeftLockInstance._alpha" };
-			static inline const char* right_path{ "_root.HUDMovieBaseInstance.BottomRightLockInstance._alpha" };
+			static constexpr const char* left_path{ "_root.HUDMovieBaseInstance.BottomLeftLockInstance._alpha" };
+			static constexpr const char* right_path{ "_root.HUDMovieBaseInstance.BottomRightLockInstance._alpha" };
 		};
 
 		static inline bool holding_breath{ false };
